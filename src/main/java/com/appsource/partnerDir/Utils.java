@@ -42,7 +42,7 @@ public class Utils {
 			countrySearchElement.sendKeys(Character.toString(c));
 		}
 		try {
-			Thread.sleep(Duration.ofSeconds(10));
+			Thread.sleep(Duration.ofSeconds(15));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -50,13 +50,12 @@ public class Utils {
 		try {
 			Thread.sleep(Duration.ofSeconds(5));
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		driver.findElement(By.xpath("//button[@name='apply_button']")).click();
 	}
 
-	public static void getPartnerDetails(int partnerNumber, WebDriver driver) {
+	public static List<Object> getPartnerDetails(int partnerNumber, WebDriver driver) {
 
 		String partnerNameXpath = "//div[@class='header']//h1";
 		String productsXpath = "(//div[@class='card-products-box']//span)";
@@ -65,7 +64,8 @@ public class Utils {
 		String partnerDescXpath = "//div[@class='partner-description']";
 		String solPartnerDesgnXpath = "//div[text()='Solutions Partner designation']/../following-sibling::div//li";
 		String expertiseCategoryXpath = "(//div[text()='Partner Expertise']/../following-sibling::div)[2]//h6";
-
+		String additionalInfoXpath = "//a/label[text()='Additional information']";
+		String partnerContactInfoXpath = "//div[@aria-labelledby='partner-details-links-header']//a";
 
 		try {
 			driver.findElement(By.xpath("//div[@role='listitem']["+partnerNumber+"]")).click();
@@ -81,7 +81,11 @@ public class Utils {
 
 		//printing partners name
 		String partnerName = driver.findElement(By.xpath(partnerNameXpath)).getText();
-		System.out.println("Partner name of partner number "+partnerNumber+" is : "+partnerName);
+		System.out.println("Partner name : "+partnerName);
+
+		//partner profile link
+		String partnerProfilePageUrl = driver.getCurrentUrl();
+		System.out.println("Partner profile link : "+partnerProfilePageUrl);
 
 		//finding all products
 		List<WebElement> allProducts = driver.findElements(By.xpath(productsXpath));
@@ -96,31 +100,64 @@ public class Utils {
 			e.printStackTrace();
 		}
 		List<WebElement> allLocations= driver.findElements(By.xpath(locationsXpath));
+		List<String> locations = new ArrayList<String>();
 		System.out.println("\nAll locations from this partners are : ");
 		for(WebElement location : allLocations) {
-			if(location.getText().contains("United States")) System.out.println(location.getAttribute("textContent"));
+			//if(location.getText().contains("United States")) 
+			locations.add(location.getAttribute("textContent"));
+			System.out.println(location.getAttribute("textContent"));
 		}
 
 		//finding partner description
 		String partnerDesc = driver.findElement(By.xpath(partnerDescXpath)).getText();
-		System.out.println(partnerDesc);
+		System.out.println("partner description :\n"+partnerDesc);
 
 		//finding partner designations
 		List<WebElement> partnerDesignations = driver.findElements(By.xpath(solPartnerDesgnXpath));
+		List<String> designations = new ArrayList<String>();
 		System.out.println("\nAll designations from this partners are : ");
-		for(WebElement designation : partnerDesignations) System.out.println(designation.getText());
+		for(WebElement designation : partnerDesignations) {
+			designations.add(designation.getText());
+			System.out.println(designation.getText());
+		}
 
 		//get partner expertise
 		List<WebElement> expertiseCategory = driver.findElements(By.xpath(expertiseCategoryXpath));
+		List<String> experties = new ArrayList<String>();
 		System.out.println("\nAll expertise from this partners are : ");
 		for(WebElement category : expertiseCategory) {
 			System.out.println("Expertise Category : "+category.getText());
 			String expertiesXpath = "(//div[text()='Partner Expertise']/../following-sibling::div)[2]//h6[text()='"+category.getText()+"']//following-sibling::ul//li";
 			List<WebElement> expertises = driver.findElements(By.xpath(expertiesXpath));
-			for(WebElement expertise : expertises) System.out.println(expertise.getText());
+			for(WebElement expertise : expertises) {
+				experties.add(expertise.getText());
+				System.out.println(expertise.getText());
+			}
 		}
 
+		//partner contact information
+		System.out.println("Partner contact information : ");
+		driver.findElement(By.xpath(additionalInfoXpath)).click();
+		List<WebElement> contactInfos = driver.findElements(By.xpath(partnerContactInfoXpath));
+		List<String> contactInfoLinks = new ArrayList<String>();
+		for(WebElement contactInfo : contactInfos) {
+			contactInfoLinks.add(contactInfo.getText()+" : "+contactInfo.getAttribute("href"));
+			System.out.println(contactInfo.getText()+" : "+contactInfo.getAttribute("href"));
+		}
+
+		List<Object> partnerDetails = new ArrayList<Object>();
+		partnerDetails.add(partnerName);
+		partnerDetails.add(partnerProfilePageUrl);
+		partnerDetails.add(partnerDesc);
+		partnerDetails.add(locations);
+		partnerDetails.add(designations);
+		partnerDetails.add(experties);
+		partnerDetails.add(contactInfoLinks);
+
 		driver.navigate().back();
+		driver.navigate().back();
+
+		return partnerDetails;
 
 	}
 }
