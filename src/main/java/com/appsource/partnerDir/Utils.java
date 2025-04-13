@@ -19,25 +19,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Utils {
 
-
 	public static void selectCountry(String countryName, WebDriver driver) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 		driver.switchTo().frame("partnersIframe");
 		WebElement selectLocElement = driver.findElement(By.xpath("//button[text()='Select location']"));
 		selectLocElement.click();
 		WebElement countrySearchElement = driver.findElement(By.id("searchBox"));
-
-
 		Actions action = new Actions(driver);
 		wait.until(ExpectedConditions.visibilityOfAllElements(driver.findElements(By.xpath("//div[@role='listitem']"))));
 		driver.findElement(By.id("searchBoxContainer")).click();
 		countrySearchElement.click();
 		try {
-			Thread.sleep(Duration.ofSeconds(10));
+			Thread.sleep(Duration.ofSeconds(15));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 		for(char c:countryName.toCharArray()) {
 			countrySearchElement.sendKeys(Character.toString(c));
 		}
@@ -146,14 +142,29 @@ public class Utils {
 		}
 
 		List<Object> partnerDetails = new ArrayList<Object>();
-		partnerDetails.add(partnerName);
-		partnerDetails.add(partnerProfilePageUrl);
-		partnerDetails.add(partnerDesc);
-		partnerDetails.add(locations);
-		partnerDetails.add(designations);
-		partnerDetails.add(experties);
-		partnerDetails.add(contactInfoLinks);
-
+		
+		List<String> row1 = new ArrayList<String>(); 
+		int rowCount = Math.max(Math.max(locations.size(), designations.size()),Math.max(experties.size(),contactInfoLinks.size()));
+		for(int i=0;i<rowCount;i++) {
+			String location = i<locations.size() ? locations.get(i) : null;
+			String designation = i<designations.size() ? designations.get(i) : null;
+			String expertie = i<experties.size() ? experties.get(i) : "";
+			String contactInfoLink = i<contactInfoLinks.size() ? contactInfoLinks.get(i) : null;
+			if(i == 0) {
+				row1.add(partnerName);
+				row1.add(partnerProfilePageUrl);
+				row1.add(location);
+				row1.add(partnerDesc);
+				row1.add(designation);
+				row1.add(expertie);
+				row1.add(contactInfoLink);
+				partnerDetails.add(row1);
+			}
+			else {
+				partnerDetails.add(new String[] {"","",location,"",designation,expertie,contactInfoLink});
+			}
+		}
+		
 		driver.navigate().back();
 		driver.navigate().back();
 
