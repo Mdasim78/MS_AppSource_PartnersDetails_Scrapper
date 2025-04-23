@@ -64,21 +64,17 @@ public class Utils {
 		String partnerContactInfoXpath = "//div[@aria-labelledby='partner-details-links-header']//a";
 
 		try {
-			wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[@role='listitem']["+partnerNumber+"]"))));
-			driver.findElement(By.xpath("//div[@role='listitem']["+partnerNumber+"]")).click();
-		}
-		catch(NoSuchElementException e1) {
-			e1.printStackTrace();
-			driver.switchTo().frame("partnersIframe");
-			driver.findElement(By.xpath("//div[@role='listitem']["+partnerNumber+"]")).click();
-		}
-		catch(StaleElementReferenceException e2) {
-			e2.printStackTrace();
 			driver.switchTo().parentFrame();
 			driver.switchTo().frame("partnersIframe");
-			driver.findElement(By.xpath("//div[@role='listitem']["+partnerNumber+"]")).click();
+			wait.until(ExpectedConditions.visibilityOfAllElements(driver.findElements(By.xpath("//div[@role='listitem']//p[@class='name']"))));
+			driver.findElement(By.xpath("(//div[@role='listitem']//p[@class='name'])["+partnerNumber+"]")).click();
 		}
-
+		catch(Exception e1) {
+			e1.printStackTrace();
+			driver.switchTo().frame("partnersIframe");
+			driver.findElement(By.xpath("(//div[@role='listitem']//p[@class='name'])["+partnerNumber+"]")).click();
+		}
+		
 		//printing partners name
 		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(partnerNameXpath))));
 		String partnerName = driver.findElement(By.xpath(partnerNameXpath)).getText();
