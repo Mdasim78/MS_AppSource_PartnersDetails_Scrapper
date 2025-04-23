@@ -1,17 +1,21 @@
 package com.appsource.partnerDir;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVPrinter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ErrorTest {
-		public static void main(String[] args) {
+		public static void main(String[] args) throws IOException {
 			WebDriver driver = new ChromeDriver();
 			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 			driver.get("https://appsource.microsoft.com/en-us/marketplace/partner-dir");
@@ -44,16 +48,20 @@ public class ErrorTest {
 				for(WebElement partner : partnersNameElement) partnerNames.add(partner.getText());
 				
 			}
-			driver.findElement(By.xpath("(//div[@role='listitem'])[11]")).click();
-			driver.navigate().back();
-			driver.switchTo().frame("partnersIframe");
-			int counter = driver.findElements(By.xpath("//div[@role='listitem']")).size();
-			for(int i=1;i<=counter;i++) {
-				List<Object> partnerDetails = Utils.getPartnerDetails(i,driver,wait);
-				//csvPrinter.printRecords(partnerDetails);
-				for(Object partnerdetail :partnerDetails) System.out.println(String.valueOf(partnerdetail));
-				System.out.println("-------------------------------------");
+			CSVPrinter csvPrinter = DataExporter.createCSVprinter(new File("ExtractedData.csv"));
+			csvPrinter.printComment("Egypt");
+			for(int i=1;i<=18;i++) {
+				
+				List<Object> partnerDetails = Utils.getPartnerDetails(i, driver, wait);
+				csvPrinter.printRecords(partnerDetails);
+				
+//				if(!driver.findElement(By.xpath(nextBtnXpath)).isDisplayed()) {
+//					System.out.println("Iterated through all the partners for this country");
+//					csvPrinter.close();
+//					break;
+//				}
 			}
-			driver.findElement(By.xpath("//div[@role='listitem']//p[text()='I Tech Pro']")).click();
+			csvPrinter.close();
+			
 		}
 }
