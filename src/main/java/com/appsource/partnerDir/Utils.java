@@ -20,31 +20,27 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class Utils {
 
 	public static void selectCountry(String countryName, WebDriver driver) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40));
 		driver.switchTo().frame("partnersIframe");
-		WebElement selectLocElement = driver.findElement(By.xpath("//button[text()='Select location']"));
+		WebElement selectLocElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[text()='Select location']")));
 		selectLocElement.click();
-		WebElement countrySearchElement = driver.findElement(By.id("searchBox"));
+		WebElement countrySearchElement =  wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("searchBox")));
 		Actions action = new Actions(driver);
-		wait.until(ExpectedConditions.visibilityOfAllElements(driver.findElements(By.xpath("//div[@role='listitem']"))));
+		//wait.until(ExpectedConditions.visibilityOfAllElements(driver.findElements(By.xpath("//div[@role='listitem']"))));
 		driver.findElement(By.id("searchBoxContainer")).click();
 		countrySearchElement.click();
 		try {
-			Thread.sleep(Duration.ofSeconds(15));
+			Thread.sleep(15000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		for(char c:countryName.toCharArray()) {
 			countrySearchElement.sendKeys(Character.toString(c));
 		}
-		try {
-			Thread.sleep(Duration.ofSeconds(15));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@id='as_containerSearch_searchBox']//li")));
 		action.sendKeys(Keys.DOWN).sendKeys(Keys.ENTER).build().perform();
 		try {
-			Thread.sleep(Duration.ofSeconds(5));
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +88,7 @@ public class Utils {
 		//finding all locations
 		driver.findElement(By.xpath(locDropdownXpath)).click();
 		try {
-			Thread.sleep(Duration.ofSeconds(5));
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

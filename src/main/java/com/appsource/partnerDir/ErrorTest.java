@@ -17,36 +17,24 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class ErrorTest {
 		public static void main(String[] args) throws IOException {
 			WebDriver driver = new ChromeDriver();
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40));
 			driver.get("https://appsource.microsoft.com/en-us/marketplace/partner-dir");
 			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 			driver.manage().window().maximize();
 			Utils.selectCountry("Egypt", driver);
 			
 			String nextBtnXpath = "//button//span[text()='Next']";
-			try {
-				Thread.sleep(Duration.ofSeconds(20));
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			List<String> partnerNames = new ArrayList<String>();
-			List<WebElement> partnersNameElement = driver.findElements(By.xpath("//div[@role='listitem']//p[@class='name']"));
+			List<WebElement> partnersNameElement = wait.until(ExpectedConditions.refreshed(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath("//div[@role='listitem']//p[@class='name']"))));
 			
-			for(WebElement partner : partnersNameElement) partnerNames.add(partner.getText());
+			for(WebElement partner : partnersNameElement) {
+				partnerNames.add(partner.getText());
+			}
 
 		
 			while(!partnerNames.contains("I Tech Pro")) {
 				driver.findElement(By.xpath(nextBtnXpath)).click();
-				try {
-					Thread.sleep(Duration.ofSeconds(20));
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				partnersNameElement = driver.findElements(By.xpath("//div[@role='listitem']//p[@class='name']"));
-				for(WebElement partner : partnersNameElement) partnerNames.add(partner.getText());
-				
+							
 			}
 			CSVPrinter csvPrinter = DataExporter.createCSVprinter(new File("ExtractedData.csv"));
 			csvPrinter.printComment("Egypt");
